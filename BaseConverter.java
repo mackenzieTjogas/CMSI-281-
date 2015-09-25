@@ -24,67 +24,187 @@ To convert BBA326CF from hexadecimal to base twenty, we would run <i>java BaseCo
 If we run <i>java BaseConverter [6][14] 26 14</i>, the output should be <i>[12][2]</i>.</p>
 
 <p>The above-described special notation should also be used for outputting the target number.</p>
-
-11,11,23,656 [11,11,23,656]
 */
 
 import java.util.Arrays; 
 import java.util.ArrayList;
 
 public class BaseConverter {
+    private static ArrayList<Long> startingNumber = new ArrayList<>();
+    private static Long startingBase;
+    private static Long targetBase;
 
-    /** This method attempts to validate the command-line arguments. If they're
-        okay, it returns true; otherwise, it returns false. */
-    
-    public static boolean validArgs ( String[] args ) {
-        //check and make sure the input arguments are valid
+    public static boolean validArgs (String[] args) {
+      
+       return (args.length == 2 || args.length == 3) && 
+            args[0].matches("(\\[\\d+\\])+") && 
+            args[1].matches("\\d+") 
+            && (args.length != 3 || args[2].matches("\\d+")); //Toal's code but I understand perfecttly 
+    }
         
-        long startingBase;
-        long targetBase = 10;
-        long convertedBase;
-        long[] startingNumber;
-
+    public static void readArguments(String[] args) {
+        
         startingBase = Long.parseLong(args[1]);
-        targetBase = Long.parseLong(args[2]);
-        String[] startingNumberString = args[0].substring(1, args[0].length()-1).split("\\]\\[");
-        
-        System.out.println(Arrays.toString(startingNumberString));
+        targetBase = args.length == 3 ? Long.parseLong(args[2]): 10;
+        startingNumber = Arrays.stream(args[0].substring(1, args[0].length() - 1)
+            .split("]\\["))
+            .mapToLong(Long::parseLong)
+            .collect(ArrayList::new, ArrayList::add, ArrayList::addAll); //Toal put it on the board + Java API, but I understand 
 
-        return true; //fix this later 
     }
     
-    public static long ConvertStartingBase(long startingBase, long targetBase) {
-        ArrayList<Long> result = new ArrayList<>();
-
-        System.out.println(result.toString());
-
+    public static  ArrayList<Long> convertStartingBase(long startingBase, long targetBase) {
+        ArrayList<Long> firstResult = new ArrayList<>();
         long n = startingBase;
-        while (n > 0) {
-            result.add(n % targetBase);
-            n = n / targetBase;
-
-            System.out.println(result.toString());
+        if (n == 0) {
+            firstResult.add((long) 0);
+            return firstResult;
         }
+        while (n > 0) {
+            firstResult.add(0, n % targetBase);
+            n = n / targetBase;
+        }
+        return firstResult;
+    }
 
-        return ArrayUtils.reverse(result);
+    public static ArrayList<Long> plus(ArrayList<Long> greaterNum, ArrayList<Long> lesserNum, long targetBase) {
+        long carry = 0;
+        ArrayList<Long> bigger = null;
+        ArrayList<Long> smaller = null;
+        long carryPlusSum = 0;
+        ArrayList<Long> carryPlusSumCorrectBase = new ArrayList<>();
+        ArrayList<Long> sum = new ArrayList<>();
+        if (greaterNum.size() == lesserNum.size()) {
+            for (int i = greaterNum.size() - 1; i >= 0; i--) {
+                carryPlusSum = (long) (greaterNum.get(i) + lesserNum.get(i) + carry);
+                carryPlusSumCorrectBase = convertStartingBase(carryPlusSum, targetBase);
+                if (carryPlusSumCorrectBase.size() == 2) {
+                    carry = carryPlusSumCorrectBase.get(0);
+                    sum.add(0, carryPlusSumCorrectBase.get(1));
+                } else {
+                    carry = 0;
+                    sum.add(0, carryPlusSumCorrectBase.get(0));
+                }
+            }
+            sum.add(0, carry);
+        } else {
+            if (greaterNum.size() > lesserNum.size()) {
+                bigger = greaterNum;
+                smaller = lesserNum;
+            } else if (greaterNum.size() < lesserNum.size()) {
+                smaller = greaterNum;
+                bigger = lesserNum;
+            }
+            int difference = bigger.size() - smaller.size();
+            for (int i = smaller.size() - 1; i >= 0; i--) {
+                carryPlusSum = (long) (bigger.get(difference + i) + smaller.get(i) + carry);
+                carryPlusSumCorrectBase = convertStartingBase(carryPlusSum, targetBase);
+                if (carryPlusSumCorrectBase.size() == 2) {
+                    carry = carryPlusSumCorrectBase.get(0);
+                    sum.add(0, carryPlusSumCorrectBase.get(1));
+                } else {
+                    carry = 0;
+                    sum.add(0, carryPlusSumCorrectBase.get(0));
+                }
+            }
+            for (int i = difference - 1; i >= 0; i--) {
+                carryPlusSum = (long) (bigger.get(i) + carry);
+                carryPlusSumCorrectBase = convertStartingBase(carryPlusSum, targetBase);
+                if (carryPlusSumCorrectBase.size() == 2) {
+                    carry = carryPlusSumCorrectBase.get(0);
+                    sum.add(0, carryPlusSumCorrectBase.get(1));
+                } else {
+                    carry = 0;
+                    sum.add(0, carryPlusSumCorrectBase.get(0));
+                }
+            }
+            sum.add(0, carry);
+        }
+        return sum;
     }
        
+
+    public static ArrayList<Long> multiply(ArrayList<Long> greaterNum, ArrayList<Long> lesserNum, long targetBase) {
+        long product;
+        ArrayList<Long> newProduct = new ArrayList<>();
+        ArrayList<Long> finalProduct = new ArrayList<>();
+        finalProduct.add((long) 0);
+        long initialShift = 0;
+        for (int i = lesserNum.size() - 1; i >= 0; i--) {
+            long secondShift = 0;
+            for (int j = greaterNum.size() - 1; j >= 0; j--) {
+                product = lesserNum.get(i) * greaterNum.get(j);
+                newProduct = convertStartingBase(product, targetBase);
+                for (int k = 0; k < (secondShift + initialShift); k++) {
+                    newProduct.add((long) 0);
+                }
+                finalProduct = plus(newProduct, finalProduct, targetBase);
+                secondShift++;
+            }
+            secondShift = 0;
+            initialShift++;
+        }
+        return finalProduct;
+    }
     
-    /** This method calls validArgs() to check the command-line arguments and, if they're valid, 
-        it takes care of the conversion and outputs the result. */
+
+    public static ArrayList<Long> convertNumber(ArrayList<Long> startingNumber, long startingBase, long targetBase) {
+        ArrayList<Long> convertedInitialBase = convertStartingBase(startingBase, targetBase);
+        ArrayList<Long> finalConvertedNumber = new ArrayList<>(0);
+        ArrayList<Long> zero = new ArrayList<>();
+        zero.add((long) 0);
+        ArrayList<Long> firstDigit = new ArrayList<>();
+        firstDigit.add(startingNumber.get(0));
+        finalConvertedNumber = plus(firstDigit, zero, targetBase);
+        for (int i = 1; i < startingNumber.size(); i++) {
+            finalConvertedNumber = multiply(finalConvertedNumber, convertedInitialBase, targetBase);
+            firstDigit = new ArrayList<>();
+            firstDigit.add(startingNumber.get(i));
+            finalConvertedNumber = plus(firstDigit, finalConvertedNumber, targetBase);
+        }
+        return finalConvertedNumber;
+
+    }
     
-    public static void main ( String[] args ) {
-        if ( ! validArgs ( args ) ) {
+    public static ArrayList<Long> takeOffZeros(ArrayList<Long> list) {
+        ArrayList<Long> result = new ArrayList<>();
+        boolean keepTrimming = true;
+        for (int i = 0; i < list.size(); i++) {
+            Long item = list.get(i);
+            if (item != 0) keepTrimming = false; 
+            if (!keepTrimming) {
+                result.add(item);
+            }
+        }
+        return result;
+    }
+
+    public static void trimmedNumber (ArrayList<Long> list) {
+        for (int i = 0; i < list.size(); i++) {
+            Long item = list.get(i);
+            System.out.print("[" + item + "]");
+        }
+        System.out.println();
+    }
+
+    public static void main (String[] args) {
+        if (!validArgs(args)) {
             throw new IllegalArgumentException();
         }
         else {
-            
-            long startingBase = Long.parseLong(args[1]);
-            long targetBase = Long.parseLong(args[2]);
-            long conversionFactor = ConvertStartingBase(startingBase, targetBase);
-            System.out.println("ConversionFactor: " + conversionFactor); //take this away later 
+            readArguments(args);
+            ArrayList<Long> finalResult;
+            if (startingNumber.size() == 1 && startingNumber.get(0) == 0) {
+                finalResult = startingNumber;
+            } else {
+                finalResult = convertNumber(startingNumber, startingBase, targetBase);
+                finalResult = takeOffZeros(finalResult);
+            }
+
+            trimmedNumber(finalResult);
            
         }
+
     }
 
 }
