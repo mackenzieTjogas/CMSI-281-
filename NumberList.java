@@ -1,4 +1,3 @@
-
 /**     
 
     <b>Note: Corrections have been made to the return types for both toArray() methods. (2015-10-13).</b>
@@ -18,11 +17,13 @@ public class NumberList implements Collection {
     private static int successes = 0;
 
     /** Constructs an empty number list. */
+    //worst-case performance: θ(1)
     public NumberList(){
         list = new Long[16];
     }
 
     /** Constructs a number list from an array of Longs. */
+    //worst-case performance: θ(n)
     public NumberList(Long[] l){
         list = new Long[l.length];
         for (int i = 0; i < l.length; i++) {
@@ -32,6 +33,7 @@ public class NumberList implements Collection {
     }
     
     /** Increases by one the number of instances of the given element in this collection. */
+    //worst-case performance: θ(n)
     public boolean add (Object obj) {
         if (!(obj instanceof Long)) {
             return false;
@@ -46,6 +48,7 @@ public class NumberList implements Collection {
     }
     
     /** Adds all of the elements of the given number list to this one. */
+    //worst-case performance: θ(n²)
     public boolean addAll (java.util.Collection c) {
         Object[] cArray = c.toArray();
         if (cArray.length > 0) {
@@ -66,11 +69,14 @@ public class NumberList implements Collection {
     }
  
     /** Removes all of the elements from this collection. */
+    //worst-case performance: θ(1)
     public void clear () {
-        list = new Long[0];
+        list = new Long[16];
+        numberSize = 0;
     }
  
     /** Returns true iff this number list contains at least one instance of the specified element. */
+    //worst-case performance: θ(n)
     public boolean contains (Object obj) {
         if (obj instanceof Long) {
             for (int i = 0; i < list.length; i++) {
@@ -85,6 +91,7 @@ public class NumberList implements Collection {
     /** Returns true iff this number list contains at least one instance of each element 
         in the specified list. Multiple copies of some element in the argument do not
         require multiple copies in this number list. */
+    //worst-case performance: θ(n³)
     public boolean containsAll (java.util.Collection c) {
         for (int i = 0; i < c.size(); i++) {
             if (!this.contains(c.toArray()[i])) {
@@ -95,7 +102,8 @@ public class NumberList implements Collection {
     }
  
     /** Compares the specified object with this collection for equality. */
-    public boolean equals ( Object obj ) {
+    //worst-case performance: θ(n)
+    public boolean equals (Object obj) {
         if (!(obj instanceof NumberList)) {
             return false;
         }
@@ -116,11 +124,13 @@ public class NumberList implements Collection {
     }
  
     /** Returns the hashcode value for this collection. */
+    //worst-case performance: θ(1)
     public int hashCode () {
         return super.hashCode();
     }
 
     /** Returns true if this collection contains no elements. */
+    //worst-case performance: θ(1)
     public boolean isEmpty () {
         if (list.length == 0) {
             return true;
@@ -138,6 +148,7 @@ public class NumberList implements Collection {
 
     /** Removes a single instance of the specified element from 
         this collection, if it is present. */
+    //worst-case performance: θ(n²)
     public boolean remove (Object obj) {
         if (!(obj instanceof Long)) {
             return false;
@@ -154,6 +165,7 @@ public class NumberList implements Collection {
 
     /** Removes all of this collection's elements that are also contained 
         in the specified collection. */
+    //worst-case performance: θ(n³)
     public boolean removeAll ( java.util.Collection c ) {
         if (this.containsAll(c)) {
             Object[] cArray = c.toArray();
@@ -168,6 +180,7 @@ public class NumberList implements Collection {
 	/** Retains only the elements in this collection that are contained in the specified collection. 
 		 In other words, removes from this collection all of its elements that are not contained in the 
 		 specified collection. */
+    //worst-case performance: θ(n³)
 	public boolean retainAll (java.util.Collection c) {
 		if (c instanceof Collection) {
             for (int i = 0; i < numberSize; i++) {
@@ -183,6 +196,7 @@ public class NumberList implements Collection {
 	}
 
     /** Returns the number of elements in this number list, including duplicates. */
+    //worst-case performance: θ(1)
     public int sizeIncludingDuplicates () {
         if (list.length > Integer.MAX_VALUE) {
             return Integer.MAX_VALUE;
@@ -191,8 +205,10 @@ public class NumberList implements Collection {
     }
     
     /** Returns a Long[] containing all of the elements in this collection, not including duplicates. */
+    //worst-case performance: θ(n²)
     public Long[] toArray () {
-        Long[] copyArray = list;
+        Long[] copyArray = new Long[list.length];
+        System.arraycopy(list, 0, copyArray, 0, list.length);
         for (int i = 0; i < copyArray.length; i++) {
             for (int j = i + 1; j < copyArray.length; j++) {
                 if (copyArray[i] == copyArray[j]) {
@@ -223,14 +239,16 @@ public class NumberList implements Collection {
     }
 
     /** Returns the number of elements in this number list, not including duplicates. */
+    //worst-case performance: θ(n²)
     public int size () {
         return this.toArray().length;
     }
 
     /** Returns the number of instances of the given element in this number list. */
+    //worst-case performance: θ(n)
     public int count (Object obj) {
         int countDuplicates = 0;
-        for (int i = 0; i < this.list.length; i++) {
+        for (int i = 0; i < numberSize; i++) {
             if (this.list[i] == obj) {
                 countDuplicates++;
             }
@@ -239,6 +257,7 @@ public class NumberList implements Collection {
     }
     
     /** This returns a stringy version of this number list. */
+    //worst-case performance: θ(n)
     public String toString () { // overrides Object.toString()
         String finalString = "";
         for (int i= 0; i < numberSize; i++) {
@@ -249,6 +268,7 @@ public class NumberList implements Collection {
 
     /** This so-called "static factory" returns a new number list comprised of the numbers in the specified array.
         Note that the given array is long[], not Long[]. */
+    //worst-case performance: θ(n)
     public static NumberList fromArray (long[] l) {
         int i = 0;
         Long[] converted = new Long[l.length];
@@ -256,8 +276,7 @@ public class NumberList implements Collection {
             converted[i++] = x;
         }
 
-        NumberList n = new NumberList(converted);
-        return n;
+        return new NumberList(converted);
     }
 
     /** This main method is just a comprehensive test program for the class. */
@@ -274,12 +293,10 @@ public class NumberList implements Collection {
         test_remove();
         test_removeAll();
         test_retainAll();
-        //test_sizeIncludingDuplicates();
         test_toArray();
-        //test_size();
-        //test_count();
-        //test_toString();
-        //test_fromArray();
+        test_count();
+        test_giantList();
+        test_emptyListCanBeConstructed();
 
         System.out.println(successes + "/" + attempts + " tests passed.");
     }
@@ -445,7 +462,7 @@ public class NumberList implements Collection {
     }
     
     private static void test_toArray() {
-        System.out.println("Tesing toArray...");
+        System.out.println("Testing toArray...");
         Long[] testArray16 = new Long[]{8L, 10L, 13L, 25L, 10L};
         NumberList input16 = new NumberList(testArray16);
         Long[] testArray17 = new Long[]{8L, 10L, 13L, 25L};
@@ -462,6 +479,46 @@ public class NumberList implements Collection {
 
     }
 
-}
+    private static void test_emptyListCanBeConstructed() {
+        System.out.println("Testing empty list...");
+        try {
+            NumberList input = new NumberList();
+            displaySuccessIfTrue(input.size() == 0);
+        } catch (Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
+    private static void test_giantList() {
+        System.out.println("Testing a really big list...");
+        Long[] testArray = new Long[5000000];
+        java.util.Arrays.fill(testArray, 1L);
+        System.out.println("Constructing a big list...");
+        NumberList list = new NumberList(testArray);
 
+
+        try {
+            displaySuccessIfTrue(list.count(1L) == 5000000);
+        } catch(Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
     
+    private static void test_count() {
+        System.out.println("Testing count...");
+        Long[] testArray14 = new Long[]{5L, 5L, 6L, 7L, 5L, 5L, 6L};
+        NumberList input15 = new NumberList(testArray14);
+
+        try {
+            displaySuccessIfTrue(input15.count(5L) == 4);
+        } catch(Exception e) {
+            displaySuccessIfTrue(false);
+        }
+
+        try {
+            displaySuccessIfTrue(input15.count(6L) == 2);
+        } catch(Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
+
+}
