@@ -1,4 +1,14 @@
 
+/**     
+
+    <b>Note: Corrections have been made to the return types for both toArray() methods. (2015-10-13).</b>
+
+    An object of this class represents a number list, i.e., an ordered collection
+    of integers, each of Java class <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html">Long</a>, 
+    with duplicates permitted. Be sure to read the Java documentation on
+    <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html">interface java.util.Collection</a>.
+
+*/
 import java.util.Collection;
 
 public class NumberList implements Collection {
@@ -35,7 +45,6 @@ public class NumberList implements Collection {
         return true;
     }
     
-
     /** Adds all of the elements of the given number list to this one. */
     public boolean addAll (java.util.Collection c) {
         Object[] cArray = c.toArray();
@@ -56,13 +65,11 @@ public class NumberList implements Collection {
         return true; 
     }
  
-
     /** Removes all of the elements from this collection. */
     public void clear () {
         list = new Long[0];
     }
  
-
     /** Returns true iff this number list contains at least one instance of the specified element. */
     public boolean contains (Object obj) {
         if (obj instanceof Long) {
@@ -75,8 +82,6 @@ public class NumberList implements Collection {
         return false;
     }
  
-
-
     /** Returns true iff this number list contains at least one instance of each element 
         in the specified list. Multiple copies of some element in the argument do not
         require multiple copies in this number list. */
@@ -89,9 +94,6 @@ public class NumberList implements Collection {
         return true;
     }
  
- 
-
-
     /** Compares the specified object with this collection for equality. */
     public boolean equals ( Object obj ) {
         if (!(obj instanceof NumberList)) {
@@ -113,13 +115,10 @@ public class NumberList implements Collection {
         return true;
     }
  
-
     /** Returns the hashcode value for this collection. */
     public int hashCode () {
         return super.hashCode();
     }
-
-
 
     /** Returns true if this collection contains no elements. */
     public boolean isEmpty () {
@@ -129,8 +128,6 @@ public class NumberList implements Collection {
         return false;
     }
 
-
-
     /** Returns an iterator over the elements in this collection. Replicated elements should
         be "iterated over" just once. */
     public java.util.Iterator iterator () {
@@ -138,8 +135,6 @@ public class NumberList implements Collection {
         /* REPLACE THE NEXT STATEMENT WITH YOUR CODE */
         throw new UnsupportedOperationException();
     }
-
-
 
     /** Removes a single instance of the specified element from 
         this collection, if it is present. */
@@ -156,8 +151,6 @@ public class NumberList implements Collection {
         }
         return false;
     }
-
-
 
     /** Removes all of this collection's elements that are also contained 
         in the specified collection. */
@@ -189,7 +182,6 @@ public class NumberList implements Collection {
         return false;
 	}
 
-
     /** Returns the number of elements in this number list, including duplicates. */
     public int sizeIncludingDuplicates () {
         if (list.length > Integer.MAX_VALUE) {
@@ -198,8 +190,6 @@ public class NumberList implements Collection {
         return list.length;
     }
     
-    
-
     /** Returns a Long[] containing all of the elements in this collection, not including duplicates. */
     public Long[] toArray () {
         Long[] copyArray = list;
@@ -257,8 +247,6 @@ public class NumberList implements Collection {
         return finalString;
     }
 
-
-    
     /** This so-called "static factory" returns a new number list comprised of the numbers in the specified array.
         Note that the given array is long[], not Long[]. */
     public static NumberList fromArray (long[] l) {
@@ -272,7 +260,6 @@ public class NumberList implements Collection {
         return n;
     }
 
-    
     /** This main method is just a comprehensive test program for the class. */
     public static void main (String[] args) {
         attempts = 0;
@@ -285,7 +272,7 @@ public class NumberList implements Collection {
         test_containsAll();
         test_equals();
         test_remove();
-        //test_removeAll();
+        test_removeAll();
         test_retainAll();
         //test_sizeIncludingDuplicates();
         test_toArray();
@@ -430,7 +417,7 @@ public class NumberList implements Collection {
         System.out.println("Tesing removeAll...");
         Long[] testArray9 = new Long[]{6L, 7L, 8L, 9L, 10L};
         NumberList input10 = new NumberList(testArray9);
-        //input10.removeAll(new java.util.ArrayList<Long>(java.util.Arrays.asList(new L;
+        input10.removeAll(new java.util.ArrayList<Long>(java.util.Arrays.asList(new Long[]{6L, 10L, 8L})));
 
         try {
             displaySuccessIfTrue(input10.list[0] == 7L && input10.list[1] == 9L);
@@ -456,7 +443,6 @@ public class NumberList implements Collection {
         }
 
     }
-
     
     private static void test_toArray() {
         System.out.println("Tesing toArray...");
@@ -477,3 +463,5 @@ public class NumberList implements Collection {
     }
 
 }
+
+    
