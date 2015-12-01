@@ -1,0 +1,248 @@
+import java.lang.Iterable;
+import java.util.*;
+
+public class BinaryTree implements Iterable {
+    private Node root;
+    private Node cursor;
+    private int size;
+    private static int successes;
+    private static int attempts;
+    
+    public BinaryTree() {
+        //constructs an empty tree
+    }
+    public BinaryTree(Object obj) {
+        //constructs a tree with just a root node decorated with (i.e., referring to) obj
+        root = new Node(obj);
+        size++;
+    }
+
+    public boolean contains(Object obj) {
+        for (Object o: this) {
+            if ((o.equals(obj))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean similar(Object obj) {
+        if (!(obj instanceof BinaryTree)) {
+            return false;
+        }          
+        BinaryTree bt = (BinaryTree) obj; 
+        if (this.size() != bt.size()) {
+            return false;
+        }
+        Iterator it1 = this.iterator();
+        Iterator it2 = bt.iterator();
+        while (it1.hasNext()) {
+            Node o1 = (Node)it1.next();
+            Node o2 = (Node)it2.next();
+
+            if ((o1.left() != null && o2.left() == null) || (o1.left() == null && o2.left() != null)) {
+                return false;
+            }
+            if ((o1.right() != null && o2.right() == null) || (o1.right() == null && o2.right() != null)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    public boolean equals(Object obj) {
+        if (!(obj instanceof BinaryTree)) {
+            return false;
+        }          
+        BinaryTree bt = (BinaryTree) obj; 
+        if (this.size() != bt.size()) {
+            return false;
+        }
+        Iterator it1 = this.iterator();
+        Iterator it2 = bt.iterator();
+        while (it1.hasNext()) {
+            Object o1 = ((Node)it1.next()).data();
+            Object o2 = ((Node)it2.next()).data();
+            if (!o1.equals(o2)) {
+                return false;
+            }
+        }
+        it1 = this.inOrder();
+        it2 = bt.inOrder();
+        while (it1.hasNext()) {
+            Object o1 = ((Node)it1.next()).data();
+            Object o2 = ((Node)it2.next()).data();
+            if (!o1.equals(o2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public boolean isEmpty() {
+        return size() == 0;
+    }
+    public int size() {
+        return size;
+    }
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    public Iterator iterator() {
+        return preOrder();
+    }
+
+    private Iterator preOrder() {
+        return new Iterator() {
+            public Object next() {return null;}
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            public boolean hasNext() {return false;}
+        };
+    }
+        //put into a stack
+        //should return a preorder iterator over the tree, 
+        //it is permitted for our iterators' remove() methods to throw UnsupportedOperationExceptions
+
+    public Iterator inOrder() {
+        return new Iterator() {
+            public Object next() {return null;}
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            public boolean hasNext() {return false;}
+        };
+        //should return an inorder iterator over the tree
+        //it is permitted for our iterators' remove() methods to throw UnsupportedOperationExceptions
+    }
+
+    //For constructing trees, we will exploit the notion of a cursor that can be made to 
+    //refer to different nodes. To support this idea, your class will need to implement 
+    //the following instance methods, all of which return a success flag:
+    
+    public boolean putCursorAtRoot() {
+        if (isEmpty()) {
+            return false;
+        } 
+        cursor = root;
+        return true;
+    }
+    public boolean putCursorAtLeftSon() {
+        if (cursor.left() == null) {
+            return false;
+        } 
+        cursor = cursor.left();
+        return true;
+
+    }
+    public boolean putCursorAtRightSon() {
+        if (cursor.right() == null) {
+            return false;
+        } 
+        cursor = cursor.right();
+        return true;
+    }
+    public boolean putCursorAtFather() {
+        if (cursor.parent() == null) {
+            return false;
+        } 
+        cursor = cursor.parent();
+        return true;
+    }
+    public boolean attachLeftSonAtCursor(Object obj) {
+        if (cursor.left() != null) {
+            return false;
+        } 
+        cursor.left(new Node(obj));
+        return true;
+    }
+    public boolean attachRightSonAtCursor(Object obj) {
+        if (cursor.right() != null) {
+            return false;
+        } 
+        cursor.right(new Node(obj));
+        return true;
+    }
+    public boolean pruneFromCursor() {
+        if (cursor == null) {
+            return false;
+        }
+        if (cursor.parent() != null) {
+            Node oldNode = cursor;
+            cursor = cursor.parent();
+            if (cursor.left() == oldNode) {
+                cursor.left(null); 
+            }
+            if (cursor.right() == oldNode) {
+                cursor.right(null); 
+            }
+        }
+        cursor = root;
+        return true;
+    }
+
+    public class Node {
+        private Object data;
+        private Node leftNode;
+        private Node rightNode;
+        private Node parentNode;
+
+        public Node(Object data) {
+            this.data = data;
+        }
+        public Node(Object data, Node leftNode, Node rightNode, Node parentNode) {
+            this.data = data;
+            this.leftNode = leftNode;
+            this.rightNode = rightNode;
+            this.parentNode = parentNode;
+        }
+        public Object data() {
+            return data; 
+        }
+        public Node left() {
+            return this.leftNode;
+        }
+        public Node right() {
+            return this.rightNode;
+        }
+        public Node parent() {
+            return this.parentNode;
+        }
+        public void left(Node obj) {
+            this.leftNode = obj;
+        }
+        public void right(Node obj) {
+            this.rightNode = obj;
+        }
+        public void parent(Node obj) {
+            this.parentNode = obj;
+        }
+    }
+
+    public static void main(String[] args) {
+        attempts = 0;
+        successes = 0;
+
+        // test_constructors();
+        // test_contains();
+        // test_similar();
+        // test_equals();
+        // test_isEmpty();
+        // test_size();
+        // test_hashCode();
+        // test_iterator();
+        // test_inOrder();
+
+        System.out.println(successes + "/" + attempts + " tests passed.");
+    } 
+
+    private static void displaySuccessIfTrue(boolean value) {
+        attempts++;
+        successes += value ? 1 : 0;
+
+        System.out.println(value ? "successes" : "failure");
+    }
+
+
+}
