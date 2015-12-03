@@ -17,7 +17,6 @@ public class BinaryTree implements Iterable {
         owner = this;
         root = new Node(obj);
         size++;
-        //this.cursor = root;
     }
     public boolean contains(Object obj) {
         for (Object o: this) {
@@ -108,6 +107,9 @@ public class BinaryTree implements Iterable {
             int count;
             Stack<Object> stack = new Stack<Object>();
             public Object next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 if (current == null) {
                     count++;
                     current = root;
@@ -173,8 +175,10 @@ public class BinaryTree implements Iterable {
             int count;
             Stack<Object> stack = new Stack<Object>();
             public Object next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
                 if (current == null) {
-                    //count++;
                     current = root;
                 }
                 while (true) {
@@ -205,12 +209,6 @@ public class BinaryTree implements Iterable {
                     count++;
                     stack.push(current);
                     return current;
-                    // if (current.right() != null) {
-                    //     current = current.right();
-                    //     continue;
-                    // }
-                    // current = current.parent();
-                    // continue;
                 }
             }
             public void remove() {
@@ -222,14 +220,14 @@ public class BinaryTree implements Iterable {
         };
     }
     public boolean putCursorAtRoot() {
-        if (isEmpty()) {
+        if (root == null) {
             return false;
         } 
         cursor = root;
         return true;
     }
     public boolean putCursorAtLeftSon() {
-        if ((this.isEmpty()) && (cursor.left() == null)) {
+        if ((this.isEmpty()) || (cursor.left() == null)) {
             return false;
         } 
         cursor = cursor.left();
@@ -237,14 +235,14 @@ public class BinaryTree implements Iterable {
 
     }
     public boolean putCursorAtRightSon() {
-        if ((this.isEmpty()) && (cursor.right() == null)) {
+        if ((this.isEmpty()) || (cursor.right() == null)) {
             return false;
         } 
         cursor = cursor.right();
         return true;
     }
     public boolean putCursorAtFather() {
-        if ((this.isEmpty()) && (cursor.parent() == null)) {
+        if ((this.isEmpty()) || (cursor.parent() == null)) {
             return false;
         } 
         cursor = cursor.parent();
@@ -268,10 +266,15 @@ public class BinaryTree implements Iterable {
         size++;
         return true;
     }
+    public int trimSize(Node n) {
+        return 1 + (n.left() != null ? trimSize(n.left()) : 0) + (n.right() != null ? trimSize(n.right()) : 0);
+    }
+
     public boolean pruneFromCursor() {
         if (cursor == null) {
             return false;
         }
+        size -= trimSize(cursor);
         if (cursor.parent() != null) {
             Node oldNode = cursor;
             cursor = cursor.parent();
@@ -334,6 +337,7 @@ public class BinaryTree implements Iterable {
         test_size();
         test_preOrder();
         test_inOrder();
+        test_pruneFromCursor();
 
         System.out.println(successes + "/" + attempts + " tests passed.");
     } 
@@ -366,9 +370,18 @@ public class BinaryTree implements Iterable {
         bt.putCursorAtRightSon();
         bt.attachLeftSonAtCursor("f");
         bt.attachRightSonAtCursor("g");
+        BinaryTree bt2 = new BinaryTree("z");
+        bt2.putCursorAtRoot();
+        bt2.attachLeftSonAtCursor("y");
+        bt2.attachRightSonAtCursor((BinaryTree) bt);
 
         try {
             displaySuccessIfTrue(bt.contains("b"));
+        } catch(Exception e) {
+            displaySuccessIfTrue(false);
+        }
+        try {
+            displaySuccessIfTrue(bt2.contains(bt));
         } catch(Exception e) {
             displaySuccessIfTrue(false);
         }
@@ -578,5 +591,32 @@ public class BinaryTree implements Iterable {
         }
         displaySuccessIfTrue(str.equals(result));
     }
-
+    private static void test_pruneFromCursor() {
+        System.out.println("Testing pruneFromCursor...");
+        BinaryTree bt = new BinaryTree("a");
+        bt.putCursorAtRoot();
+        bt.attachLeftSonAtCursor("b");
+        bt.attachRightSonAtCursor("c");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("d");
+        bt.attachRightSonAtCursor("e");
+        bt.putCursorAtRightSon();
+        bt.attachLeftSonAtCursor("f");
+        bt.attachRightSonAtCursor("g");
+        bt.pruneFromCursor();
+        BinaryTree bt2 = new BinaryTree("a");
+        bt2.putCursorAtRoot();
+        bt2.attachLeftSonAtCursor("b");
+        bt2.attachRightSonAtCursor("c");
+        bt2.putCursorAtRightSon();
+        bt2.attachLeftSonAtCursor("d");
+        //bt2.attachRightSonAtCursor("e");
+        //bt2.putCursorAtRightSon();
+        
+        try {
+            displaySuccessIfTrue(bt2.equals(bt));
+        } catch(Exception e) {
+            displaySuccessIfTrue(false);
+        }
+    }
 }
