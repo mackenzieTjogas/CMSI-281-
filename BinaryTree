@@ -3,6 +3,7 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.NoSuchElementException;
 
+//we are assuming we cannot add nodes to an empty binary tree 
 public class BinaryTree implements Iterable {
     private Node root;
     private Node cursor;
