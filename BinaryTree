@@ -1,5 +1,7 @@
 import java.lang.Iterable;
-import java.util.*;
+import java.util.Iterator;
+import java.util.Stack;
+import java.util.NoSuchElementException;
 
 public class BinaryTree implements Iterable {
     private Node root;
@@ -612,11 +614,15 @@ public class BinaryTree implements Iterable {
         bt2.attachLeftSonAtCursor("d");
         //bt2.attachRightSonAtCursor("e");
         //bt2.putCursorAtRightSon();
-        
+
+
         try {
             displaySuccessIfTrue(bt2.equals(bt));
         } catch(Exception e) {
             displaySuccessIfTrue(false);
         }
     }
+
+
+
 }
