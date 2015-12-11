@@ -1,6 +1,8 @@
 import java.util.Scanner;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Collections;
+import java.util.ArrayList;
 
 public class WordFrequencies {
     public static void main(String[] args) {
@@ -31,7 +33,10 @@ public class WordFrequencies {
                 }
             }
         }
-        for (String word : wordSet) {
+        ArrayList<String> sortedList = new ArrayList<String>(wordSet);
+        Collections.sort(sortedList);
+
+        for (String word : sortedList) {
             System.out.println(word + (isClean ? "" : " " + map.get(word)));
         }
     }
