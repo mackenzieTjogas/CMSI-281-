@@ -8,3 +8,5 @@ LinkedDeque: 29/35
 
 Binary Tree: 26/45
  * Iterator had infinite loop for some cases
+
+WordFrequencies: 35/35
